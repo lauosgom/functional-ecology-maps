@@ -214,69 +214,6 @@ saveRDS(exp11_pred_2019_V1, "exp11_pred_2019.RDS")
 exp11_pred_2019 <- readRDS("exp11_pred_2019.RDS")
 
 
-par(mfcol=c(1, 2))
-# ------- 1. S?lo para test set --------------------------------
 
 
-df_Me_B_SlGe_2019_test<- read.csv("df_Me_B_SlGe_2019_test_points.csv",header = T)
-df_Me_B_SlGe_2019_train<- read.csv("df_Me_B_SlGe_2019_train_points.csv",header = T)
 
-pred_test <- evalua(df_Me_B_SlGe_2019_test, exp11_mod3_2019)
-
-p.test    <- scatterplot(pred_test, "TEST")
-
-# ------- 2. S?lo para el train set ----------------------------
-pred_train <- evalua(df_Me_B_SlGe_2019_train, exp11_mod3_2019)
-p.train    <- scatterplot(pred_train, "TRAIN")
-
-# ------- Im?gen -----------------------------------------------
-par(mfcol=c(1, 1))
-
-View(df_Me_B_SlGe_2019_test)
-
-y_real <- df_Me_B_SlGe_2019_train %>%
-  select(FRic)
-y_pred <- predict.gbm(object  = exp11_mod3_2019,
-                      newdata = df_Me_B_SlGe_2019_train %>%
-                        select(-any_of('FRic')),
-                      n.trees = exp11_mod3_2019$n.tree)
-#---
-pred_trin <- data.frame(Y_real=y_real, Y_hat=y_pred)
-}
-
-
-y_real <- df_Me_B_SlGe_2019_test %>%
-  select(FRic)
-y_pred <- predict.gbm(object  = exp11_mod3_2019,
-                      newdata = df_Me_B_SlGe_2019_test %>%
-                        select(-any_of('FRic')),
-                      n.trees = exp11_mod3_2019$n.tree)
-#---
-pred_test <- data.frame(Y_real=y_real, Y_hat=y_pred)
-
-summary(pred_test)
-View(pred_test)
-
-plot(pred_test$FRic, pred_test$Y_hat)
-plot(pred_trin$FRic, pred_trin$Y_hat)
-
-
-plot(pred_test$FRic, 
-     pred_test$Y_hat, 
-     main = paste0("Scatterplot -", nom, "-"),
-     xlab = "Y real", 
-     ylab = "Y hat", 
-     pch  = 19,
-     cex  = .6,
-     xlim = c(0, 1), 
-     ylim = c(0, 1))
-abline(a=0, b=1, col="red")
-
-model<- lm(data= pred_trin, FRic~Y_hat)
-
-model2<- lm(data= pred_test, FRic~Y_hat)
-summary(model2)
-
-write.csv(pred_test, "pred_test_v2.csv")
-
-write.csv(pred_trin, "pred_test_v2.csv")
