@@ -1,5 +1,5 @@
 # Functional Ecology maps
-This repository is under construction. It belongs to one of the chapters for my masters thesis where I use field and GEDI data with the GLAD metrics to fit models and predict the functional diversity ina mountainrange located in Guatemala. Other contributors are Francisco Alvarez-Vargas and Carla Restrepo
+This repository is under construction. It belongs to one of the chapters for my masters thesis where I use field and GEDI data with the GLAD metrics to fit models and predict the functional diversity across a mountainrange located in Guatemala. Other contributors are Francisco Alvarez-Vargas and Carla Restrepo
 
 # Data sources
 
