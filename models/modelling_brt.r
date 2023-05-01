@@ -123,7 +123,7 @@ pred_train <- evalua(df_Me_B_SlGe_2019_train, exp11_mod3_2019)
 rmse_train <- sqrt(mean((pred_train$Y_hat - pred_train$Y_real)^2))
 mae_train <- mean(abs(pred_train$Y_hat - pred_train$Y_real))
 
-lm_train <- lm(data = pred_train, Y_real ~ Y_hat) 
+lm_train <- lm(data = pred_train, Y_real ~ Y_hat)
 summary(lm_train)
 
 # Evaluation metrics for testing data
