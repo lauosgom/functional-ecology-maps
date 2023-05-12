@@ -17,6 +17,6 @@ Global Land Analysis and Discovery from the University of Maryland https://glad.
 # Modelling
 We fitted a Boosted Regression Tree, Random Forest and XGBoost using the different functional metrics (FRic, FEve, FDiv and FDis) as response variables and the 192 GLAD metrics Pheno-c + slope as predictors. You can find the code for each model, evaluation metrics and prediction in the Models folder
 
-# Artifact in construction
+# Manuscript in preparation
 Ospina, L., F. Alvarez-Vargas and C. Restrepo. Investigating regional environmental drivers of species- and stand-level functional diversity in a tropical mountainscape
 
