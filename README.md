@@ -3,15 +3,20 @@ This repository is under construction. It belongs to one of the chapters for my 
 
 # Data sources
 
-## Field data
-We collected data on the field from the period 2010-2019 and added data from other work developed in the area by other authors 
+## Point data
+### Field data
+We collected data on the study site from the period 2010-2019 and added data from other work developed in the area by other authors 
 
-## GEDI data
-https://gedi.umd.edu
+### GEDI data
+The Global Ecosystem Dynamics Investigation project (GEDI) https://gedi.umd.edu
 
-## GLAD data
+## Optical data
+### GLAD data
 Global Land Analysis and Discovery from the University of Maryland https://glad.umd.edu/dataset
 
 # Modelling
 We fitted a Boosted Regression Tree, Random Forest and XGBoost using the different functional metrics (FRic, FEve, FDiv and FDis) as response variables and the 192 GLAD metrics Pheno-c + slope as predictors. You can find the code for each model, evaluation metrics and prediction in the Models folder
+
+# Manuscript in preparation
+Ospina, L., F. Alvarez-Vargas and C. Restrepo. Investigating regional environmental drivers of species- and stand-level functional diversity in a tropical mountainscape
 
