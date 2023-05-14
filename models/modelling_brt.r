@@ -1,36 +1,25 @@
-#set working directory
+# Modelling Boosted Regression Tree after the data engineering is done
+
+# Set working directory
 setwd("D:/")
 setwd("/media/lospina/USB") #linux
 
-#import the required functions
+# Import the required functions
 source("/github/functional_ecology_maps/functions.r")
 
-#modelling after the data engineering is done
-
-# training data
-df_Me_B_SlGe_2019_train <- read.csv("df_Me_B_SlGe_2019_train_points_v2.csv", header = T)
-
-# remove duplicated rows
-df_Me_B_SlGe_2019_train <- df_Me_B_SlGe_2019_train[!duplicated(df_Me_B_SlGe_2019_train$FRic), ]
-
-# testing data
-df_Me_B_SlGe_2019_test <- read.csv("df_Me_B_SlGe_2019_test_points_v2.csv", header = T)
-
-# remove duplicated rows
-df_Me_B_SlGe_2019_test <- df_Me_B_SlGe_2019_test[!duplicated(df_Me_B_SlGe_2019_test$FRic), ]
+# Read data
+data <- read.csv("data_set.csv", header = T)
 
 # read the raster stack generated in the data engineering part
 br_MeSl_2019_c <- stack("stack2.tiff")
 
-# full data for testing
-df_Me_B_SlGe_2019_train_total <- rbind(df_Me_B_SlGe_2019_train, df_Me_B_SlGe_2019_test)
+# If the csv got a X column, remove it
+data <-select(data, -any_of("X"))
 
-# exclude the variables you are not going to use
-excluded_vars <- c("FDiv", "FEve", "FDis")
+data_split <- initial_split(data, prop = 2/4)
 
-# remove the excluded variables from the data
-df_Me_B_SlGe_2019_train <-select(df_Me_B_SlGe_2019_train, -any_of(excluded_vars))
-df_Me_B_SlGe_2019_test  <-select(df_Me_B_SlGe_2019_test, -any_of(excluded_vars))
+data_train <- training(data)
+data_test  <- testing(data)
 
 #=============< Modelling >==============================================
 # ------- Hiper-tunning Modelo inicial ------------------------------
@@ -38,9 +27,9 @@ df_Me_B_SlGe_2019_test  <-select(df_Me_B_SlGe_2019_test, -any_of(excluded_vars))
 # FJAV: Por la recomendaci?n de Elith et al. 2008, hay que bajar "learning_rate"
 #       para alcanzar m?s de 1000 ?rboles (BRT p11)
 system.time(
-  exp11_mod1_2019 <- gbm.step(data            = df_Me_B_SlGe_2019_train, 
-                              gbm.x           = 1:190, 
-                              gbm.y           = 191, 
+  exp11_mod1_2019 <- gbm.step(data            = data_train, 
+                              gbm.x           = 1:ncol(data_train)-1, 
+                              gbm.y           = ncol(data_train), 
                               family          = "gaussian", 
                               tree.complexity = 5,
                               max.trees       = 2500, 

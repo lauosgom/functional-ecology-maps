@@ -16,53 +16,43 @@ library(dismo)
 library(sf)
 library(terra)
 library(lubridate)
+library(mlr)
+library(xgboost)
 library(tidyverse)
 
 ## functions
-
-#=============< Funciones propias F Alvarez>=======================================
-Cortar_Raster <- function(capa, molde) {
+# The 'cut_raster' function receives a raster and a shapefile and returns a rasterfile clipped by the shapefile
+cut_raster <- function(capa, molde) {
   corte <- crop(capa, molde)
   corte <- mask(corte, molde)
   return(corte)
 }
 
-# La funci?n 'evalua' recibe un data.frame con la estructura del DF 
+# the 'evaluate' function receives a data.frame with thw DF strucure of:
 # 'df_Me_B_Ge_2019': {rh95, pred_1, pred_2, ..., pred_n}
-# y recibe tambi?n el modelo ajustado.
-# Retorna un DF con: {val_real, val_predicho}
-evalua <- function(DF, modelo) {
+# and the adjusted model
+# returns a DF wit: {val_real, val_predicho}
+evaluate <- function(DF, model) {
   y_real <- DF[ ,ncol(DF)]
   y_pred <- predict.gbm(object  = modelo,
                         newdata = DF[ , 1:ncol(DF)-1],
                         n.trees = modelo$n.tree)
   #---
-  return(data.frame(Y_real=y_real, Y_hat=y_pred))
+  return(data.frame(Y_real = y_real, Y_hat=y_pred))
 }
 
-# La funci?n 'scatterplot' recibe el DF con: {val_real, val_predicho},
-# y el nombre del conjunto de puntos a evaluar.
-# Retorna una gr?fica de dispersi?n para evaluar la precisi?n de la
-# predicci?n
+# the 'scatterplot' function receives the DF with: {val_real, val_predicho},
+# and the name of the set of data to evaluate.
+# returns a dispersion graph to evaluate the accuracy of the prediction
 scatterplot <- function(DF, nom) {
-  plot(DF$Y_real, 
-       DF$Y_hat, 
+  plot(DF$Y_real,
+       DF$Y_hat,
        main = paste0("Scatterplot -", nom, "-"),
-       xlab = "Y real", 
-       ylab = "Y hat", 
+       xlab = "Y real",
+       ylab = "Y hat",
        pch  = 19,
        cex  = .6,
-       xlim = c(0, 100), 
+       xlim = c(0, 100),
        ylim = c(0, 100))
-  abline(a=0, b=1, col="red")
-}
-
-# Rescale the raster data
-rescale01 <- function(x) {
-  
-  val <- values(x)
-  
-  values(x) <- (val - min(val, na.rm = TRUE)) / (max(val, na.rm = TRUE) - min(val, na.rm = TRUE))
-  
-  x
+  abline(a = 0, b = 1, col = "red")
 }
