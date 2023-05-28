@@ -56,3 +56,37 @@ scatterplot <- function(DF, nom) {
        ylim = c(0, 100))
   abline(a = 0, b = 1, col = "red")
 }
+
+aggregate_data <- function(data_family, code_plot) {
+  # Convert into a dataframe
+  data_test<- as.data.frame(data_family)
+  
+  # Extract the code and time you want to aggregate
+  chrono_help <- data_test %>% 
+    filter(grepl(code_plot, code))
+  
+  # Aggregate by taking the max value of the columns
+  chrono_new<-as.data.frame(t(as.matrix(colMax(chrono_help))))
+  
+  for (i in 2:nrow(chrono_help)) {
+    chrono_help[i,2:ncol(chrono_help)]<-chrono_new[,-c(1)]
+  }
+  
+  # Remove the code and time from the original database
+  data_family <- data_family %>% 
+    filter(!str_detect(code, code_plot))
+  
+  # Paste the row at the end of the database
+  data_family <- rbind(data_family,chrono_help)
+  
+  return(data_family)
+}
+
+raster01 = function(r){
+  
+  # get the min max values
+  minmax_r = range(values(r), na.rm=TRUE) 
+  
+  # rescale 
+  return( (r-minmax_r[1]) / (diff(minmax_r)))
+}
