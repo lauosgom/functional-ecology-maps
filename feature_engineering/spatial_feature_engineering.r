@@ -67,7 +67,7 @@ gedi$rh95[GEDI$rh95 < 3] <- 0
 zona     <- readOGR(zonagdb)
 
 #==============< Reading the GLAD metrics PHENO_C >=============================
-metrics <- list.files(path = dirmet, full.names=T) 
+metrics <- list.files(path = dirmet, full.names = T)
 metrics <- metrics[-c(189:191)] # remove water
 
 system.time(Brmet_2019 <- lapply(metrics, raster))
@@ -93,19 +93,27 @@ slope <- raster01(slope)
 
 #=======================< Extent adjustments >==================================
 zona <- spTransform(zona, crs(br_Me_B_2019))
-br_Me_B_2019_c <- cut_raster(br_Me_B_2019, zona)
+brick_metrics_c <- cut_raster(br_Me_B_2019, zona)
 slope <- cut_raster(slope, zona)
 
 #=======================< Merge slope with metrics >============================
-br_MeSl_2019_c <- stack(br_Me_B_2019_c, slope)
+brick_metrics_c <- stack(brick_metrics_c, slope)
+
+#========================< VIF >================================================
+# VIF for the metrics
+v1 <- vifstep(brick_metrics_c)
+v2 <- vifcor(brick_metrics_c, th = 0.7)
+
+# keep only the variables that are not correlated
+brick_metrics_c <- exclude(brick_metrics_c, v1)
 
 #==============< Data.frame's for modelling >====================================
 # ------- Complete DF -----------------------------------------------
-df_Me_B_Sl_2019   <- as.data.frame(raster::extract(br_MeSl_2019_c, gedi))
-df_Me_B_Sl_2019   <- as.data.frame(raster::extract(br_MeSl_2019_c, points))
+df_metric_c <- as.data.frame(raster::extract(brick_metrics_c, gedi))
+df_metric_c <- as.data.frame(raster::extract(brick_metrics_c, points))
 
-df_Me_B_SlGe_2019 <- cbind(df_Me_B_Sl_2019, GEDI)
-df_Me_B_SlGe_2019 <- cbind(df_Me_B_Sl_2019, points)
+df_metric_c_points <- cbind(df_metric_c, GEDI)
+df_metric_c_points <- cbind(df_metric_c, points)
 
 #for GEDI data
 excluded_vars <- c("lat_lowest", "lon_lowest", "delta_time2", "delta_timeh", "sensitivit",  # nolint
