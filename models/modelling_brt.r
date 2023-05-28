@@ -1,14 +1,16 @@
 # Modelling Boosted Regression Tree after the data engineering is done
 
 # Set working directory
-setwd("D:/")
+#set directory
+setwd("/Volumes/USB/chapter_2/") #mac
+setwd("D:/") #windows
 setwd("/media/lospina/USB") #linux
 
 # Import the required functions
-source("/github/functional_ecology_maps/functions.r")
+source("github/functional-ecology-maps/feature_engineering/functions.r")
 
 # Read data
-data <- read.csv("data_set.csv", header = T)
+data <- read.csv("github/functional-ecology-maps/data/data_set.csv", header = T)
 
 # read the raster stack generated in the data engineering part
 br_MeSl_2019_c <- stack("stack2.tiff")

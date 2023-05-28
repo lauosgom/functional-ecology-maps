@@ -1,7 +1,7 @@
 #feature engineering - brt model
 
 #set directory
-setwd("/Volumes/USB")
+setwd("/Volumes/USB") #mac
 setwd("D:/") #windows
 setwd("/media/lospina/USB") #linux
 
