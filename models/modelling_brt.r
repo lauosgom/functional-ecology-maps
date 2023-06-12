@@ -4,24 +4,24 @@
 #set directory
 setwd("/Volumes/USB/chapter_2/") #mac
 setwd("D:/") #windows
-setwd("/media/lospina/USB") #linux
+setwd("/media/lospina/USB/chapter_2") #linux
 
 # Import the required functions
 source("github/functional-ecology-maps/feature_engineering/functions.r")
 
 # Read data
-data <- read.csv("github/functional-ecology-maps/data/data_set.csv", header = T)
+data <- read.csv("data_set.csv", header = T)
 
 # read the raster stack generated in the data engineering part
-br_MeSl_2019_c <- stack("stack2.tiff")
+br_MeSl_2019_c <- stack("data/optical/brick.tif")
 
 # If the csv got a X column, remove it
 data <-select(data, -any_of("X"))
 
 data_split <- initial_split(data, prop = 2/4)
 
-data_train <- training(data)
-data_test  <- testing(data)
+data_train <- training(data_split)
+data_test  <- testing(data_split)
 
 #=============< Modelling >==============================================
 # ------- Hiper-tunning Modelo inicial ------------------------------
@@ -30,8 +30,8 @@ data_test  <- testing(data)
 #       para alcanzar m?s de 1000 ?rboles (BRT p11)
 system.time(
   exp11_mod1_2019 <- gbm.step(data            = data_train, 
-                              gbm.x           = 1:ncol(data_train)-1, 
-                              gbm.y           = ncol(data_train), 
+                              gbm.x           = 1:35, 
+                              gbm.y           = 36, 
                               family          = "gaussian", 
                               tree.complexity = 5,
                               max.trees       = 2500, 
@@ -109,7 +109,7 @@ exp11_pred_2019_V1 <- raster::predict(object   = br_MeSl_2019_c,
                                       overwrite = TRUE)
 
 # Evaluation metrics for training data  
-pred_train <- evalua(df_Me_B_SlGe_2019_train, exp11_mod3_2019)
+pred_train <- evaluate(data_train, exp11_mod1_2019)
 
 rmse_train <- sqrt(mean((pred_train$Y_hat - pred_train$Y_real)^2))
 mae_train <- mean(abs(pred_train$Y_hat - pred_train$Y_real))
@@ -118,13 +118,13 @@ lm_train <- lm(data = pred_train, Y_real ~ Y_hat)
 summary(lm_train)
 
 # Evaluation metrics for testing data
-pred_test <- evalua(df_Me_B_SlGe_2019_test, exp11_mod3_2019)
+pred_test <- evaluate(data_test, exp11_mod1_2019)
 
 rmse_test <- sqrt(mean((pred_test$Y_hat - pred_test$Y_real)^2))
 mae_test <- mean(abs(pred_test$Y_hat - pred_test$Y_real))
 
 lm_test <- lm(data = pred_test, Y_real ~ Y_hat)
-summary(lm)
+summary(lm_test)
 
 # Check the importance of the variables
 exp11_mod3_2019_find.int <- gbm.interactions(exp11_mod3_2019)

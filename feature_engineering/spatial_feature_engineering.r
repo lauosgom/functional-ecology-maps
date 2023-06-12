@@ -2,21 +2,18 @@
 
 #set directory
 setwd("/Volumes/USB") #mac
-setwd("D:/") #windows
-setwd("/media/lospina/USB") #linux
+setwd("D:/chapter_2/") #windows
+setwd("/media/lospina/easystore/chapter_2/") #linux
 
 # Import libraries and functions
-source("functions.R")
+source("github/functional-ecology-maps/feature_engineering/functions.R")
 
 #=============< Directories >=========================================
-dirmet           <- "Modelo/metricas_merge/"
-dirmet           <- "Modelo/metrics_scaled/"
-gedigdb          <- "Archive/GEDI02_A_2021_Clip.shp"
-points_slm       <- "puntos/results_fd_agg_XYTableToPoint.shp" # for points
-zonagdb_small    <- "area/test_3_mod_geo.shp"
-zonagdb_water    <- "area_slm/area_SLM_2.shp" # for points
-zonagdb          <- "area/area_slm3.shp"
-dem_dir          <- "dem/dem15final.img"
+dirmet           <- "data/optical/metrics_scaled/"
+gedigdb          <- "data/points/gedi/GEDI02_A_2021_Clip.shp"
+points_slm       <- "data/points/field/results_fd_agg_XYTableToPoint.shp" # for points
+zonagdb          <- "data/area/no_water/area_slm3.shp"
+dem_dir          <- "data/dem/dem15final.img"
 
 
 #====================< Reading the data>========================================
@@ -57,7 +54,7 @@ gedi2@data <- filter(gedi2@data, hour <= 6)
 gedi@data <- rbind(gedi@data, gedi@data)
 
 #for points FD data
-points <- readOGR(points)
+points <- readOGR(points_slm)
 
 
 #==============< 3m height adjustment (Potapov et al 2021 [21828]) >============
@@ -68,7 +65,8 @@ zona     <- readOGR(zonagdb)
 
 #==============< Reading the GLAD metrics PHENO_C >=============================
 metrics <- list.files(path = dirmet, full.names = T)
-metrics <- metrics[-c(189:191)] # remove water
+metrics <- metrics[!grepl("189|190|191", metrics)] # remove water
+#metrics <- metrics[-c(189:191)] 
 
 system.time(Brmet_2019 <- lapply(metrics, raster))
 
@@ -98,14 +96,28 @@ slope <- cut_raster(slope, zona)
 
 #=======================< Merge slope with metrics >============================
 brick_metrics_c <- stack(brick_metrics_c, slope)
+names(brick_metrics_c) <- new_names
+
+# Set the output file path and name
+output_file <- "data/optical/brick.tif"
+
+# Save the raster brick
+writeRaster(brick_metrics_c, filename = output_file, format = "GTiff", overwrite = TRUE)
 
 #========================< VIF >================================================
 # VIF for the metrics
+library(usdm)
 v1 <- vifstep(brick_metrics_c)
 v2 <- vifcor(brick_metrics_c, th = 0.7)
 
 # keep only the variables that are not correlated
 brick_metrics_c <- exclude(brick_metrics_c, v1)
+
+# Set the output file path and name
+output_file <- "data/optical/brick_vif.tif"
+
+# Save the raster brick
+writeRaster(brick_metrics_c, filename = output_file, format = "GTiff", overwrite = TRUE)
 
 #==============< Data.frame's for modelling >====================================
 # ------- Complete DF -----------------------------------------------
@@ -121,9 +133,6 @@ excluded_vars <- c("lat_lowest", "lon_lowest", "delta_time2", "delta_timeh", "se
 #for points
 excluded_vars <- c("x", "y", "coords.x1", "coords.x2", "optional", "code")
 
-df_Me_B_SlGe_2019 <-select(df_Me_B_SlGe_2019, -any_of(excluded_vars)) # nolint
+df_metric_c_points <-select(df_metric_c_points, -any_of(excluded_vars)) # nolint
 
-write.csv(df_Me_B_SlGe_2019_test, "data_set.csv")
-
-#save the raster stack
-writeRaster(br_MeSl_2019_c, "stack2.tiff")
+write.csv(df_metric_c_points, "data_set.csv")
