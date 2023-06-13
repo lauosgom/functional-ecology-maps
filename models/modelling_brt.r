@@ -13,7 +13,8 @@ source("github/functional-ecology-maps/feature_engineering/functions.r")
 data <- read.csv("data_set.csv", header = T)
 
 # read the raster stack generated in the data engineering part
-br_MeSl_2019_c <- stack("data/optical/brick.tif")
+br_MeSl_2019_c <- stack("data/optical/brick_vif.tif")
+names(br_MeSl_2019_c) <- new_names_vif
 
 # If the csv got a X column, remove it
 data <-select(data, -any_of("X"))
@@ -22,6 +23,11 @@ data_split <- initial_split(data, prop = 2/4)
 
 data_train <- training(data_split)
 data_test  <- testing(data_split)
+
+write.csv(data_train, "data_train.csv")
+write.csv(data_test, "data_test.csv")
+
+colnames(data_train)
 
 #=============< Modelling >==============================================
 # ------- Hiper-tunning Modelo inicial ------------------------------
@@ -35,7 +41,7 @@ system.time(
                               family          = "gaussian", 
                               tree.complexity = 5,
                               max.trees       = 2500, 
-                              learning.rate   = .005, 
+                              learning.rate   = .002, 
                               bag.fraction    = .5
   )
 )
@@ -131,3 +137,4 @@ exp11_mod3_2019_find.int <- gbm.interactions(exp11_mod3_2019)
 exp11_mod3_2019$var.names
 
 summary(exp11_mod3_2019_find.int)
+

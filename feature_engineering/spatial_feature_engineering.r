@@ -131,7 +131,7 @@ df_metric_c_points <- cbind(df_metric_c, points)
 excluded_vars <- c("lat_lowest", "lon_lowest", "delta_time2", "delta_timeh", "sensitivit",  # nolint
                    "hour", "coords.x1", "coords.x2")
 #for points
-excluded_vars <- c("x", "y", "coords.x1", "coords.x2", "optional", "code")
+excluded_vars <- c("coords.x1", "coords.x2", "optional", "code")
 
 df_metric_c_points <-select(df_metric_c_points, -any_of(excluded_vars)) # nolint
 
