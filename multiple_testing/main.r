@@ -2,8 +2,6 @@ setwd("/Volumes/USB/chapter_2/") #mac
 setwd("D:/") #windows
 setwd("/media/lospina/USB/chapter_2")
 
-source("/media/lospina/USB/chapter_2/github/functional-ecology-maps/feature_engineering/functions.r")
-
 data <- read.csv("data_set.csv", header = T)
 colnames(data)
 
