@@ -73,14 +73,3 @@ summary(lm2)
 rmse_test <- sqrt(mean((y_pred - y_real)^2))
 mae_test <- mean(abs(y_pred - y_real))
 
-# Predicting output for the whole map
-nom_mapa<- paste0(dir, "FRic_exp11_2019_2022_04_22_scaled_rf")
-
-exp11_pred_2019_V1 <- raster::predict(object   = br_MeSl_2019_c,
-                                      model    = rf_imp,
-                                      filename = nom_mapa,
-                                      progress = "text",
-                                      n.trees  = rf_imp$ntree,
-                                      type     = "response",
-                                      format   = "GTiff",
-                                      overwrite = TRUE)

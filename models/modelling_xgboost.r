@@ -57,7 +57,7 @@ lm2 <- lm(data = df_Me_B_SlGe_2019_train, formula = pred ~ FRic)
 summary(lm2)
 
 #### prediction into a map
-dic <- getwd()
+dir <- getwd()
 nom_mapa<- paste0(dir, "model_xgboost3")
 
 result   <- predict(model     = xgb1, 

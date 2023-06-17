@@ -1,16 +1,13 @@
-setwd("/Volumes/USB/chapter_2/") #mac
-setwd("D:/") #windows
-setwd("/media/lospina/USB/chapter_2")
-
 data <- read.csv("data_set.csv", header = T)
 colnames(data)
 
-brt_model <- function(data_train, data_test, number_trees = 2500, learning_rate = .002, predictor, response){
+set.seed(123)
+brt_model <- function(data_train, data_test, number_trees = 5000, learning_rate = .002, predictor, response, rasterstack = NULL){
   
   exp11_mod1_2019 <- gbm.step(data            = data_train, 
                               gbm.x           = predictor, 
                               gbm.y           = response, 
-                              family          = "gaussian", 
+                              family          = "laplace", 
                               tree.complexity = 5,
                               max.trees       = number_trees, 
                               learning.rate   = learning_rate, 
@@ -32,7 +29,7 @@ brt_model <- function(data_train, data_test, number_trees = 2500, learning_rate 
                                 gbm.y           = response,
                                 family          = "gaussian",
                                 max.trees       = number_trees,
-                                tree.complexity = 5,
+                                tree.complexity = 10,
                                 learning.rate   = learning_rate,
                                 verbose         = FALSE)
     
@@ -65,13 +62,27 @@ brt_model <- function(data_train, data_test, number_trees = 2500, learning_rate 
     print(rmse_test)
     print(mae_test)
     
-    return(y_pred_test)
+    if (!is.null(rasterstack)){
+      dir <- getwd()
+      nom_mapa <- paste0(dir, "FRic_exp11_2019_2022_04_22_scaled_121_", i)
+      
+      exp11_pred_2019_V1 <- raster::predict(object   = rasterstack,
+                                            model    = exp11_mod3_2019,
+                                            filename = nom_mapa,
+                                            progress = "text",
+                                            n.trees  = exp11_mod3_2019$n.tree,
+                                            type     = "response",
+                                            format   = "GTiff",
+                                            overwrite = TRUE)
+    }else{
+      return(y_pred_test)
+    }
   }
  
 }
 
 
-rf_model <- function(data_train, data_test, number_trees = 2500, learning_rate = .002, predictor, response){
+rf_model <- function(data_train, data_test, number_trees = 2500, learning_rate = .002, predictor, response, rasterstack = NULL ){
   
   data_train <- select(data_train, -any_of(c("x","FDiv","FEve","FDis","y")))
   data_test <- select(data_test, -any_of(c("x","FDiv","FEve","FDis","y")))
@@ -125,10 +136,28 @@ rf_model <- function(data_train, data_test, number_trees = 2500, learning_rate =
   print(rmse_test)
   print(mae_test)
   
-  return(y_pred_test)
+  if (!is.null(rasterstack)){
+    # Predicting output for the whole map
+    dir <- getwd()
+    nom_mapa<- paste0(dir, "FRic_exp11_2019_2022_04_22_scaled_rf")
+    
+    exp11_pred_2019_V1 <- raster::predict(object   = rasterstack,
+                                          model    = rf,
+                                          filename = nom_mapa,
+                                          progress = "text",
+                                          n.trees  = rf$ntree,
+                                          type     = "response",
+                                          format   = "GTiff",
+                                          overwrite = TRUE)
+  } else {
+    return(y_pred_test)
+  }
+  
+  
+  return(rf)
 }
 
-xgboost_model <- function(data_train, data_test, predictor, response){
+xgboost_model <- function(data_train, data_test, predictor, response, rasterstack = NULL){
   # Cross validation to find the number of trees
   cv <- xgb.cv(data  = as.matrix(data_train[ ,predictor]),
                label = data_train[, c(response)],
@@ -173,6 +202,17 @@ xgboost_model <- function(data_train, data_test, predictor, response){
   print(rmse_test)
   print(mae_test)
   
-  return(y_pred_test)
+  #map
+  if (!is.null(rasterstack)){
+    xgbpred<- function(model, input, ..){
+      predict(model, newdata=as.matrix(input))
+    }
+    
+    p<- predict(rasterstack, model = model, fun = xgbpred)
+    
+    writeRaster(p, "Fric_xgboost.tif")
+  } else{
+    return(y_pred_test)
+  }
 }
 
