@@ -65,7 +65,7 @@ zona     <- readOGR(zonagdb)
 
 #==============< Reading the GLAD metrics PHENO_C >=============================
 metrics <- list.files(path = dirmet, full.names = T)
-metrics <- metrics[!grepl("189|190|191", metrics)] # remove water
+ metrics <- metrics[!grepl("189|190|191", metrics)] # remove water
 #metrics <- metrics[-c(189:191)] 
 
 system.time(Brmet_2019 <- lapply(metrics, raster))
@@ -99,7 +99,7 @@ brick_metrics_c <- stack(brick_metrics_c, slope)
 names(brick_metrics_c) <- new_names
 
 # Set the output file path and name
-output_file <- "data/optical/brick.tif"
+output_file <- "data/optical/brick_av75max_RN.tif"
 
 # Save the raster brick
 writeRaster(brick_metrics_c, filename = output_file, format = "GTiff", overwrite = TRUE)
@@ -135,4 +135,4 @@ excluded_vars <- c("coords.x1", "coords.x2", "optional", "code")
 
 df_metric_c_points <-select(df_metric_c_points, -any_of(excluded_vars)) # nolint
 
-write.csv(df_metric_c_points, "data_set.csv")
+write.csv(df_metric_c_points, "data_set_av75max_S2N.csv")
