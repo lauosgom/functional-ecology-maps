@@ -151,4 +151,4 @@ images/*
 
 example_deploy/*
 *.pem
-
+._*

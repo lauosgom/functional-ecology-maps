@@ -26,14 +26,14 @@ dirmet_scaled           <- "data/optical/metrics_scaled/"
 dirmet_merged           <- "data/optical/metricas_merge/"
 points_slm              <- "data/points/field/results_fd_agg_XYTableToPoint.shp" # for points
 zonagdb                 <- "data/area/no_water/area_slm3.shp"
-dem_dir                 <- "data/dem/dem15final.img"
-slope_dir               <- "data/dem/slope.tif"
+dem_dir                 <- "data/dem/dem_cut.tif"
+slope_dir               <- "data/dem/slope_glad_scaled.tif"
+aspect_dir               <- "data/dem/aspect_scaled.tif"
 
 #read the shapefiles - study area and plot points
 sh_points   <- readOGR(points_slm)
 zona        <- readOGR(zonagdb)
 zona        <- spTransform(zona, '+proj=longlat +datum=WGS84 +no_defs')
-
 
 #rasterstack with the quality layers
 ar_tec      <- list.files(dirmet_merged, pattern = "_TEC_")
@@ -58,15 +58,19 @@ id_na_1 <- which(is.na(df_tec[ , 2]))
 df_tec[ , 3][df_tec[ , 3] != 1] <- NA
 id_na_2 <- which(is.na(df_tec[ , 3]))
 
-# porcentaje de agua en las observaciones [0, 1000]
-threshold <- 200 # de 200 para abajo es aceptable
+# water percentage in observations
+threshold <- 200 #200 and less is acceptable
 df_tec[ , 4][df_tec[ , 4] > threshold] <- NA
 id_na_3 <- which(is.na(df_tec[ , 4]))
 
 id_na <- unique(c(id_na_1, id_na_2, id_na_3))    
 
 #topography  
-slope <- raster(slope_dir) 
+slope  <- raster(slope_dir)
+dem    <- raster(dem_dir)
+aspect <- raster(aspect_dir)
+
+br_top <- stack(slope, dem, aspect)
 
 #functions - move later
 Nombres_metricas    <- function(metClass, statGroup="Tend") { 
@@ -668,7 +672,7 @@ for (i in 1:108) {
   
   ### -----------< 7.  Hacer un Brick con las métricas y las Topografías 
   #br_Pred <- terra::merge(br_Met, slope)
-  br_Pred <- stack(br_Met, slope) 
+  br_Pred <- stack(br_Met, br_top) 
   
   ### -----------< 8.  Extraer los datos del Brick para los puntos del Shape 
   #--- Hacer la extracción 

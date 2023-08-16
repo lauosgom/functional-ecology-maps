@@ -1,7 +1,7 @@
 #feature engineering - brt model
 
 #set directory
-setwd("/Volumes/USB") #mac
+setwd("/Volumes/USB/chapter_2/") #mac
 setwd("D:/chapter_2/") #windows
 setwd("/media/lospina/easystore/chapter_2/") #linux
 
@@ -14,6 +14,9 @@ gedigdb          <- "data/points/gedi/GEDI02_A_2021_Clip.shp"
 points_slm       <- "data/points/field/results_fd_agg_XYTableToPoint.shp" # for points
 zonagdb          <- "data/area/no_water/area_slm3.shp"
 dem_dir          <- "data/dem/dem15final.img"
+slope_dir        <- "data/dem/slope_glad.tif"
+aspect_dir       <- "data/dem/aspect.tif"
+demg_dir        <- "data/dem/dem_glad.tif"
 
 
 #====================< Reading the data>========================================
