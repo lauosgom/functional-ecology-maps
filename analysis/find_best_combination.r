@@ -670,12 +670,12 @@ for (i in 1:108) {
   names(br_Met)     <- ve_metSel
   br_Met            <- terra::crop(br_Met, zona)
   
-  ### -----------< 7.  Hacer un Brick con las métricas y las Topografías 
+  ### -----------< 7. Rasterstack with metrics and topography 
   #br_Pred <- terra::merge(br_Met, slope)
   br_Pred <- stack(br_Met, br_top) 
   
-  ### -----------< 8.  Extraer los datos del Brick para los puntos del Shape 
-  #--- Hacer la extracción 
+  ### -----------< 8. Extract data from rasterstack for the shapefile points 
+  #--- Extraction
   df_Pred        <- terra::extract(br_Pred, sh_points) 
   colnames(df_Pred) <- paste0("V_", colnames(df_Pred)) 
   
