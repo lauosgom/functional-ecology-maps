@@ -12,14 +12,14 @@ library(raster)
 library(rgdal)
 
 
-terraOptions(memmax=35.5, tempdir = "/media/laura/easystore/temp/")
-dir <- "/media/laura/easystore/temp/"
+terraOptions(memmax=35.5, tempdir = "E:/temp/")
+dir <- "E:/temp/"
 tempdir()
 options(tempdir = dir)
 Sys.setenv(TMPDIR = dir)
 options(rasterTmpDir = dir)
 
-setwd("/media/laura/USB/chapter_2/")
+setwd("D:/chapter_2/")
 
 #directories
 dirmet_scaled           <- "data/optical/metrics_scaled/"
@@ -74,56 +74,33 @@ br_top <- stack(slope, dem, aspect)
 
 #functions - move later
 Nombres_metricas    <- function(metClass, statGroup="Tend") { 
-  
-  
-  
-  df_NomMetPhe     <- read.csv('/media/laura/USB/chapter_2/data/combinations/Met_PhenoC_groups.csv', header = T) 
-  
+  df_NomMetPhe     <- read.csv('D:/chapter_2/data/combinations/Met_PhenoC_groups.csv', header = T) 
   ve_Set1          <- c("Set_1", "Set_2", "Set_3") 
-  
   ve_Set2          <- c("Sets_1_2", "Sets_1_3", "Sets_2_3") 
-  
-  
-  
+
   # sii una sóla Clase de Métrica ------------------ 
-  
   if (metClass %in% ve_Set1) { 
-    
     if (metClass != "Set_3") { 
-      
       if (statGroup=="All") { 
-        
         ve_Nombres <- subset(df_NomMetPhe, Class_Metric==metClass)$VAR 
-        
       } else { 
-        
         ve_Nombres <- subset(df_NomMetPhe, Class_Metric==metClass &  
-                               
                                Statistical_group==statGroup)$VAR 
-        
       } 
       
     } else { 
       
       ve_Nombres <- subset(df_NomMetPhe, Class_Metric==metClass)$VAR 
-      
     } 
     
   } else { 
-    
-    
     
     # sii dos Clases de Métricas ----------------- 
     
     if (metClass %in% ve_Set2) { 
       
-      
-      
       ch_6 <- substr(metClass,  6, 6) 
-      
       ch_8 <- substr(metClass,  8, 8) 
-      
-      
       
       if (statGroup[1]=="All") { 
         
@@ -244,7 +221,7 @@ Nombres_metricas_LO <- function(nombre, Cant="22") {
   
   
   
-  df_NomMetPhe     <- read.csv('/media/laura/USB/chapter_2/data/combinations/Met_PhenoC_groups.csv', header = T) 
+  df_NomMetPhe     <- read.csv('D:/chapter_2/data/combinations/Met_PhenoC_groups.csv', header = T) 
   
   ve_CorrVar       <- c("LST", "RN", "S2N") 
   
@@ -283,7 +260,7 @@ Nombres_metricas_2  <- function(var_Ind, statGroup="Tend") {
   
   
   
-  df_NomMetPhe     <- read.csv('/media/laura/USB/chapter_2/data/combinations/Met_PhenoC_groups.csv', header = T) 
+  df_NomMetPhe     <- read.csv('D:/chapter_2/data/combinations/Met_PhenoC_groups.csv', header = T) 
   
   
   
@@ -423,7 +400,9 @@ brt_model           <- function(data_train, data_test, number_trees  = 2500, lea
                     
                     RSE_train  = summary(lm_train)$sigma, 
                     
-                    RSE_test   = summary(lm_test)$sigma)) 
+                    RSE_test   = summary(lm_test)$sigma)
+                    #p_value    =summary(lm_test)$coefficients[2, 4]
+         ) 
   
 } 
 rf_model            <- function(data_train, data_test, number_trees  = 2500, learning_rate = .002){ 
@@ -522,7 +501,9 @@ rf_model            <- function(data_train, data_test, number_trees  = 2500, lea
                     
                     RSE_train  = summary(lm_train)$sigma, 
                     
-                    RSE_test   = summary(lm_test)$sigma)) 
+                    RSE_test   = summary(lm_test)$sigma)
+         #p_value    =summary(lm_test)$coefficients[2, 4]
+         ) 
   
 } 
 xgboost_model       <- function(data_train, data_test, predictor, response){ 
@@ -617,7 +598,9 @@ xgboost_model       <- function(data_train, data_test, predictor, response){
                     
                     RSE_train  = summary(lm_train)$sigma, 
                     
-                    RSE_test   = summary(lm_test)$sigma)) 
+                    RSE_test   = summary(lm_test)$sigma)
+         #p_value    =summary(lm_test)$coefficients[2, 4]
+         ) 
   
 } 
 
@@ -627,15 +610,15 @@ xgboost_model       <- function(data_train, data_test, predictor, response){
 
 #Leer la BD con las 108 combinaciones 
 Var_Obj <- 2
-table_combinations <- read.csv("/media/laura/USB/chapter_2/data/combinations/combinations_selection_metrics.csv", header = T) 
+table_combinations <- read.csv("D:/chapter_2/data/combinations/combinations_selection_metrics.csv", header = T) 
 table_results <- read.csv("/media/laura/USB/chapter_2/data/results/table_comparison_i_k.csv")
 table_results <- table_results[,-1]
   
-#table_results <- data.frame(1) 
-name_table   <- "/media/laura/USB/chapter_2/data/results/table_comparison_i_k.csv" 
+table_results <- data.frame(1) 
+name_table   <- "D:/chapter_2/data/results/table_comparison_FRIC.csv" 
 
 
-for (i in 1:108) {
+for (i in 6:108) {
 
   print(i)
   fu_Com <- table_combinations$Funcion[i] 
@@ -732,7 +715,7 @@ for (i in 1:108) {
   
   
   if (i == 1) {
-    write.csv(table_results, nom_Tab)
+    write.csv(table_results, name_table)
   } else {
     write.table(c(results_brt, results_rf, results_xgb), name_table, append = TRUE, row.names = FALSE, col.names = FALSE, sep = ",")
   }
